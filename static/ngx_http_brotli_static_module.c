@@ -168,7 +168,6 @@ static ngx_int_t handler(ngx_http_request_t* req) {
     /* Ignore request properties (e.g. Accept-Encoding). */
   } else {
     /* NGX_HTTP_BROTLI_STATIC_ON */
-    req->gzip_vary = 1;
     rc = check_eligility(req);
     if (rc != NGX_OK) return NGX_DECLINED;
   }
@@ -226,6 +225,7 @@ static ngx_int_t handler(ngx_http_request_t* req) {
                   file_info.failed, path.data);
     return NGX_DECLINED;
   }
+  
 
   /* So far so good. */
   ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0, "http static fd: %d",
@@ -243,6 +243,8 @@ static ngx_int_t handler(ngx_http_request_t* req) {
     return NGX_HTTP_NOT_FOUND;
   }
 #endif
+  /* Passed conditions, add vary header */
+  req->gzip_vary = 1;
 
   /* Prepare request push the body. */
   req->root_tested = !req->error_page;
